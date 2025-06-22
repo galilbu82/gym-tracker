@@ -14,7 +14,14 @@ export default function StudioTracker() {
   const [weight, setWeight] = useState("");
   const [week, setWeek] = useState("");
   const [type, setType] = useState("");
-  const [data, setData] = useState([]);
+  type Entry = {
+  exercise: string;
+  weight: string;
+  week: string;
+  type: string;
+};
+
+  const [data, setData] = useState<Entry[]>([]);
 
   const [filterType, setFilterType] = useState("all");
   const [filterWeek, setFilterWeek] = useState("all");

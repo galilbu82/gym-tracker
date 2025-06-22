@@ -9,13 +9,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Dumbbell } from "lucide-react";
 
+// type for entries
+type Entry = {
+  exercise: string;
+  weight: string;
+  week: string;
+  type: string;
+  date: string;
+};
+
 export default function StudioTracker() {
   const [exercise, setExercise] = useState("");
   const [customExercise, setCustomExercise] = useState("");
   const [weight, setWeight] = useState("");
   const [week, setWeek] = useState("");
   const [type, setType] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Entry[]>([]);
   const [filterType, setFilterType] = useState("all");
   const [filterWeek, setFilterWeek] = useState("all");
   const [filterExercise, setFilterExercise] = useState("all");
@@ -56,7 +65,7 @@ export default function StudioTracker() {
     if (!week) return setErrorMessage("לא בחרת מספר שבוע");
     if (!type) return setErrorMessage("לא בחרת סוג אימון");
 
-    const newEntry = {
+    const newEntry: Entry = {
       exercise: finalExercise,
       weight,
       week,
@@ -188,7 +197,7 @@ export default function StudioTracker() {
           {filteredData.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.exercise}</TableCell>
-              <TableCell>{item.weight} ק"ג</TableCell>
+              <TableCell>{item.weight} ק&quot;ג</TableCell>
               <TableCell>{item.week}</TableCell>
               <TableCell>{item.type}</TableCell>
               <TableCell>{item.date}</TableCell>

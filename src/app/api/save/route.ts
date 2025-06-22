@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const sheetId = "1cygb0Z-Uhm1viiaLtpQdWkyJRwN0966Qq-31hLupQqo"; // Replace with your own Sheet ID
 
-    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "");
+    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}");
 
     const auth = new google.auth.GoogleAuth({
       credentials,

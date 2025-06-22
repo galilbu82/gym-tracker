@@ -1,4 +1,4 @@
-// StudioTracker.tsx (with Google Sheets export and API call)
+// page.tsx (StudioTracker with export to Google Sheets)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -50,12 +50,7 @@ export default function StudioTracker() {
   }, [data, userId]);
 
   useEffect(() => {
-    if (exercise === "custom") {
-      setShowCustomInput(true);
-      setCustomExercise("");
-    } else {
-      setShowCustomInput(false);
-    }
+    setShowCustomInput(exercise === "custom");
   }, [exercise]);
 
   const addEntry = () => {

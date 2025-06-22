@@ -11,12 +11,17 @@ interface Entry {
   date: string;
 }
 
+interface RequestBody {
+  userId: string;
+  data: Entry[];
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body: { userId: string; data: Entry[] } = await req.json();
+    const body: RequestBody = await req.json();
     const { userId, data } = body;
 
-    const sheetId = "1cygb0Z-Uhm1viiaLtpQdWkyJRwN0966Qq-31hLupQqo"; // Replace with your own Sheet ID
+    const sheetId = "1cygb0Z-Uhm1viiaLtpQdWkyJRwN0966Qq-31hLupQqo";
 
     const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}");
 
@@ -27,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     const sheets = google.sheets({ version: "v4", auth });
 
-    const values = data.map((entry: Entry) => [
+    const values: string[][] = data.map((entry) => [
       userId,
       entry.exercise,
       entry.weight,

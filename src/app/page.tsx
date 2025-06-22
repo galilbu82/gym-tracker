@@ -150,7 +150,7 @@ export default function StudioTracker() {
           {filteredData.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.exercise}</TableCell>
-              <TableCell>{item.weight} ק"ג</TableCell>
+              <TableCell>{item.weight} ק&apos;ג</TableCell>
               <TableCell>{item.week}</TableCell>
               <TableCell>{item.type}</TableCell>
             </TableRow>

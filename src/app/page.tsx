@@ -1,3 +1,4 @@
+// StudioTracker.tsx (with Google Sheets export and API call)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,23 +15,30 @@ export default function StudioTracker() {
   const [weight, setWeight] = useState("");
   const [week, setWeek] = useState("");
   const [type, setType] = useState("");
-  type Entry = {
-  exercise: string;
-  weight: string;
-  week: string;
-  type: string;
-};
-
-  const [data, setData] = useState<Entry[]>([]);
-
+  const [data, setData] = useState([]);
   const [filterType, setFilterType] = useState("all");
   const [filterWeek, setFilterWeek] = useState("all");
   const [filterExercise, setFilterExercise] = useState("all");
-
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [userId, setUserId] = useState("guest");
 
   const uniqueExercises = [...new Set(data.map((item) => item.exercise))];
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("user") || "guest";
+    setUserId(id);
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`gym-data-${userId}`);
+    if (saved) setData(JSON.parse(saved));
+  }, [userId]);
+
+  useEffect(() => {
+    localStorage.setItem(`gym-data-${userId}`, JSON.stringify(data));
+  }, [data, userId]);
 
   useEffect(() => {
     if (exercise === "custom") {
@@ -43,19 +51,35 @@ export default function StudioTracker() {
 
   const addEntry = () => {
     const finalExercise = exercise === "custom" ? customExercise : exercise;
-
     if (!finalExercise) return setErrorMessage("לא בחרת תרגיל");
     if (!weight) return setErrorMessage("לא הכנסת משקל");
     if (!week) return setErrorMessage("לא בחרת מספר שבוע");
     if (!type) return setErrorMessage("לא בחרת סוג אימון");
 
-    setData([...data, { exercise: finalExercise, weight, week, type }]);
+    const newEntry = {
+      exercise: finalExercise,
+      weight,
+      week,
+      type,
+      date: new Date().toLocaleDateString("he-IL"),
+    };
+    setData([...data, newEntry]);
     setExercise("");
     setCustomExercise("");
     setWeight("");
     setWeek("");
     setType("");
     setErrorMessage("");
+  };
+
+  const exportToGoogleSheets = async () => {
+    const res = await fetch("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, data }),
+    });
+    const msg = await res.text();
+    alert(msg);
   };
 
   const filteredData = data.filter((item) => {
@@ -72,9 +96,8 @@ export default function StudioTracker() {
         <h1 className="text-3xl font-bold text-gray-800">Gym Tracker</h1>
       </div>
 
-      {errorMessage && (
-        <div className="bg-red-100 text-red-700 p-2 rounded shadow">{errorMessage}</div>
-      )}
+      {errorMessage && <div className="bg-red-100 text-red-700 p-2 rounded shadow">{errorMessage}</div>}
+
       <Card>
         <CardContent className="p-4 space-y-2">
           <Select value={exercise} onValueChange={setExercise}>
@@ -86,10 +109,13 @@ export default function StudioTracker() {
               <SelectItem value="custom">+ חדש</SelectItem>
             </SelectContent>
           </Select>
+
           {showCustomInput && (
             <Input placeholder="הכנס תרגיל חדש" value={customExercise} onChange={(e) => setCustomExercise(e.target.value)} />
           )}
+
           <Input placeholder="משקל" value={weight} onChange={(e) => setWeight(e.target.value)} type="number" />
+
           <Select value={week} onValueChange={setWeek}>
             <SelectTrigger>{week ? `שבוע ${week}` : "בחר שבוע"}</SelectTrigger>
             <SelectContent>
@@ -98,6 +124,7 @@ export default function StudioTracker() {
               ))}
             </SelectContent>
           </Select>
+
           <Select value={type} onValueChange={setType}>
             <SelectTrigger>{type ? `אימון ${type}` : "בחר סוג אימון"}</SelectTrigger>
             <SelectContent>
@@ -106,6 +133,7 @@ export default function StudioTracker() {
               ))}
             </SelectContent>
           </Select>
+
           <Button onClick={addEntry}>הוסף</Button>
         </CardContent>
       </Card>
@@ -141,6 +169,8 @@ export default function StudioTracker() {
               ))}
             </SelectContent>
           </Select>
+
+          <Button onClick={exportToGoogleSheets}>ייצא ל-Google Sheets</Button>
         </CardContent>
       </Card>
 
@@ -151,15 +181,17 @@ export default function StudioTracker() {
             <TableHead>משקל</TableHead>
             <TableHead>שבוע</TableHead>
             <TableHead>אימון</TableHead>
+            <TableHead>תאריך</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredData.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.exercise}</TableCell>
-              <TableCell>{item.weight} ק&apos;ג</TableCell>
+              <TableCell>{item.weight} ק"ג</TableCell>
               <TableCell>{item.week}</TableCell>
               <TableCell>{item.type}</TableCell>
+              <TableCell>{item.date}</TableCell>
             </TableRow>
           ))}
         </TableBody>

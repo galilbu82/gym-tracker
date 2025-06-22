@@ -16,14 +16,16 @@ interface RequestBody {
   data: Entry[];
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body: RequestBody = await req.json();
     const { userId, data } = body;
 
     const sheetId = "1cygb0Z-Uhm1viiaLtpQdWkyJRwN0966Qq-31hLupQqo";
 
-    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}");
+    const credentials: Record<string, unknown> = JSON.parse(
+      process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}"
+    );
 
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     const sheets = google.sheets({ version: "v4", auth });
 
-    const values: string[][] = data.map((entry) => [
+    const values: string[][] = data.map((entry: Entry) => [
       userId,
       entry.exercise,
       entry.weight,
@@ -51,7 +53,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "נתונים נשלחו ל-Google Sheets בהצלחה" });
-  } catch (err) {
+  } catch (err: unknown) {
+    console.error("Google Sheets API Error:", err);
     return new NextResponse("שגיאה בשליחה ל-Google Sheets", { status: 500 });
   }
 }

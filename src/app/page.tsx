@@ -179,27 +179,42 @@ export default function StudioTracker() {
       </Card>
 
       <Table>
-        <TableHeader>
+       <TableHeader>
           <TableRow>
             <TableHead>תרגיל</TableHead>
             <TableHead>משקל</TableHead>
             <TableHead>שבוע</TableHead>
             <TableHead>אימון</TableHead>
             <TableHead>תאריך</TableHead>
+            <TableHead>מחק</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData.map((item, index) => (
-            <TableRow key={index}>
+           {filteredData.map((item, index) => (
+             <TableRow key={index}>
               <TableCell>{item.exercise}</TableCell>
               <TableCell>{item.weight} ק&quot;ג</TableCell>
               <TableCell>{item.week}</TableCell>
               <TableCell>{item.type}</TableCell>
               <TableCell>{item.date}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              <TableCell>
+                 <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      const newData = [...data];
+                      newData.splice(index, 1);
+                      setData(newData);
+                    }}
+                 >
+                   מחק
+                 </Button>
+               </TableCell>
+             </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
     </div>
   );
 }
